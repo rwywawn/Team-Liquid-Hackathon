@@ -1,5 +1,7 @@
 import os
 import sys
+import boto3
+
 from config import Config
 
 import discord
