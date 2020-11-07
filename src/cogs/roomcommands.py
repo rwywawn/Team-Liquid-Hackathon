@@ -14,22 +14,31 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
                 self._last_member = None
 
         @commands.command()
-        async def create_room(self, ctx, *args):
+        async def room(self, ctx, *args):
                 guild = ctx.message.guild
                 author = ctx.message.guild
-
-                room_name = f"{author.display_name.replace(' ', '-').lower()}-game-room"
+                channel = ctx.message.channel
 
                 # command list
                 if args[0] == 'create':
                         try:
-                                room = ""
+                                room_name = args[1]
+                                time = int(args[2])
+                                response = f"room to be created with name: {room_name} and time: {time}"
+                                await channel.send(response)
+                        except IndexError:
+                                response = "You are missing arguments! Check your command."
+                                await channel.send(response)
+                        except ValueError:
+                                response = "You have to pass in a number for time! Check your command."
+                                await channel.send(response)
                         except:
-                                response = "error"
+                                response = "Unknown error the fuck did you do"
                                 await channel.send(response)
 
                 elif args[0] == 'time':
                         try:
+                                time = args[1]
                                 room = ""
                         except:
                                 response = "error"
@@ -37,7 +46,7 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
 
                 elif args[0] == 'extend':
                         try:
-                                room =
+                                room = ""
                         except:
                                 response = "error"
                                 await channel.send(response)
@@ -63,7 +72,7 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
                                 response = "error"
                                 await channel.send(response)
 
-                elif args[0] = 'help':
+                elif args[0] == 'help':
                         response = "The available commands are create, time, extend, add, remove, status, and help."
                         await channel.send(response)
 
