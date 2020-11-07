@@ -78,7 +78,7 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
 
 
         @commands.command()
-        async def destroy_room(self, ctx):
+        async def destroy(self, ctx):
                 guild = ctx.message.guild
                 author = ctx.message.author
                 
