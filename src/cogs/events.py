@@ -66,5 +66,29 @@ class Events(commands.Cog):
             except IndexError:
                 await channel.send('Invalid Event Name')
 
+        elif args[0] == 'subscribe':
+            user_id = ctx.message.author.id
+            in_sub = False
+            response = sub.scan()
+            items = response['Items']
+            for i in (items):
+                if user_id == {i['sub_user']}:
+                    in_sub = True
+
+            if in_sub == False:
+                user_info = {
+                    "sub_user": user_id
+                }
+                sub.put_item(Item=user_info)
+                await channel.send("Subscribed! You will receive notifications from us!")
+            else:
+                await channel.send("You are already subscribed!")
+        
+        
+
+        
+
+
+
         else:
             await channel.send("This was not an available command please use help to see available commands")
