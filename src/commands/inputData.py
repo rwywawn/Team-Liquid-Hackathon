@@ -10,7 +10,7 @@ def inputData(tourny, teams):
 
     print("items inserted")
 
-# inputData("tourny",[{"round":1,"teamId":1,"teamName":"Poggers"},
+# inputData("ROCK",[{"round":1,"teamId":1,"teamName":"Poggers"},
 # {"round":1,"teamId":2,"teamName":"Poggers"},
 # {"round":1,"teamId":3,"teamName":"Poggers"},
 # {"round":1,"teamId":4,"teamName":"Poggers"},

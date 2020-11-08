@@ -8,19 +8,11 @@ def tableCreate(tableName):
         TableName=tableName,
         KeySchema=[
             {
-                'AttributeName': "round",
+                'AttributeName': "teamId",
                 'KeyType': 'HASH'
             },
-            {
-                'AttributeName': "teamId",
-                'KeyType': 'RANGE'
-            }
         ],
         AttributeDefinitions=[
-            {
-                'AttributeName': "round",
-                'AttributeType': 'N'
-            },
             {
                 'AttributeName': "teamId",
                 'AttributeType': 'N'
@@ -32,4 +24,5 @@ def tableCreate(tableName):
         }
     )
     print("created table "+tableName)
+    return table
 

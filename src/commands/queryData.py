@@ -1,21 +1,27 @@
 import boto3
 from boto3.dynamodb.conditions import Key
+from decimal import Decimal
 dynamodb = boto3.resource('dynamodb')
 
-def queryTeamsOnRound(tourny, round):
-
+def queryTeamsByID(tourny, teamID):
     table = dynamodb.Table(tourny)
     response = table.query(
-        KeyConditionExpression=Key('round').eq(round)
+        KeyConditionExpression=Key('teamId').eq(teamID)
     )
-    print(response['Items'])
+    return response['Items']
+    
+def queryTeamsByRound(tourny, round):
+    table = dynamodb.Table(tourny)
+    response = table.scan(FilterExpression=Key('round').eq(round))
     return response['Items']
 
-def queryTeamsByID(tourny, teamID, round):
+def updateTeamByID(tourny, teamID):
     table = dynamodb.Table(tourny)
-    response = table.query(
-        KeyConditionExpression=
-            Key('round').eq(round) & Key('teamId')
+    response = table.update_item(
+        Key={'teamId': teamID},
+        UpdateExpression="set round = round + :val",
+        ExpressionAttributeValues={
+            ':val': Decimal(1),
+        },
+        ReturnValues="UPDATED_NEW"
     )
-    return resopnse['Items']
-    
