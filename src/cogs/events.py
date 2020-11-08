@@ -1,5 +1,6 @@
 import discord 
 from discord.ext import commands
+import time
 
 import asyncio
 import json
@@ -13,6 +14,9 @@ now = datetime.now()
 dynamo = boto3.resource('dynamodb')
 events = dynamo.Table('events')
 sub = dynamo.Table('sub')
+
+def ghetto():
+    print('super ghetto memory method I give up')
 
 class Events(commands.Cog):
     
@@ -34,18 +38,16 @@ class Events(commands.Cog):
                 print(event_name, event_date, event_time, event_link)
 
                 date_total = event_date + ' ' + event_time
-                now = datetime.now()
                 future_date = datetime.strptime(date_total, '%Y-%m-%d %H:%M')
                 difference = (future_date - now).total_seconds()
-                
                 event_info = {
                     "event_name": event_name,
                     "date": date_total,
                     "link": event_link
                 }
-
                 events.put_item(Item=event_info)
                 await channel.send("Event info added to database, event created")
+
             except IndexError:
                 response = "Please check your agruments!"
                 await channel.send(response)
@@ -64,26 +66,5 @@ class Events(commands.Cog):
             except IndexError:
                 await channel.send('Invalid Event Name')
 
-        elif args[0] == 'subscribe':
-            user_id = ctx.message.author.id
-            in_sub = False
-            response = sub.scan()
-            items = response['Items']
-            for i in (items):
-                if user_id == {i['sub_user']}:
-                    in_sub = True
-                
-            if in_sub == False:
-                user_info = {
-                    "sub_user": user_id
-                }
-                sub.put_item(Item=user_info)
-                await channel.send("Subscribed! You will receive notifications from us!")
-            else:
-                await channel.send("You are already subscribed!")
-
         else:
             await channel.send("This was not an available command please use help to see available commands")
-
-def setup(bot):
-    bot.add_cog(Events(bot)) 

@@ -1,20 +1,21 @@
 import discord
 import os
+import sys
 from discord.ext import commands
 from config import Config
 import time
-client = discord.Client()
+from cogs.events import Events
+from cogs.admin import Admin
 
-client = commands.Bot(command_prefix = '!')
+bot = discord.Client()
 
-@client.event
-async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+bot = commands.Bot(command_prefix = '!')
 
-#will load all cogs
-for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
-        client.load_extension(f'cogs.{filename[:-3]}') #take off last 3 characters since the .py part isn't needed
+def main():
+    bot.add_cog(Events(bot))
+    bot.add_cog(Admin(bot))
+    bot.run(Config['token'])
 
-#for our bot authentication
-client.run(Config['token'])
+
+if __name__ == "__main__":
+    main()
