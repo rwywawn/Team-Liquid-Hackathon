@@ -1,17 +1,19 @@
-import discord
-from config import Config
-client = discord.Client()
+from flask import Flask, request
 
-@client.event
-async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+app = Flask(__name__)
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
+@app.route('/')
+def index():
+    print('args:', request.args)  # display text in console
+    print('form:', request.form)
+    print('data:', request.data)
+    print('json:', request.json)
+    print('files:', request.files)
+    #print("request:", request)
+    
 
-    if message.content.startswith('-hello'):
-        await message.channel.send('Hello!')
-    print(message.JSON)
-client.run(Config['token'])
+    print(request.args['code'])
+    return request.args.get('data', 'none')  # send text to web browser
+
+if __name__ == '__main__':
+    app.run(port=80, debug=True)
