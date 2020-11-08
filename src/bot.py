@@ -2,6 +2,7 @@ import discord
 import os
 from discord.ext import commands
 from config import Config
+import time
 client = discord.Client()
 
 client = commands.Bot(command_prefix = '!')

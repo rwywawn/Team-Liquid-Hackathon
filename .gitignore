@@ -139,3 +139,6 @@ cython_debug/
 
 #Config File
 src/config.py
+
+#testing file
+test.py
