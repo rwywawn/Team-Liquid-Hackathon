@@ -96,12 +96,5 @@ class Events(commands.Cog):
                     for users in items_user:
                         await channel.send(f"**REMINDER**: <@{users['sub_user']}> EVENT STARTING NOW {i['event_name']} AT {i['link']}")
 
-            
-
-
-        
-
-
-
         else:
             await channel.send("This was not an available command please use help to see available commands")
