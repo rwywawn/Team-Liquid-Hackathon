@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, render_template
 import requests
 from config import Config
 from oauth import Oauth
@@ -19,15 +19,26 @@ def index():
 def auth():
     code=request.args.get("code")
     accessToken= Oauth.getAccessToken(code)
+    connectionData=Oauth.getConnectionData(accessToken)
     userData=Oauth.getUserData(accessToken)
-    connections=""
-    arr=[]
-    for i in userData:
-        connections=connections+i["type"]+" "
-        arr.append(i['type'])
-    if "steam" in arr:
-        redirect('https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=https%3A%2F%2Fdiscord.com%2Fapi%2Fconnections%2Fsteam%2Fcallback%3Fstate%3D18f58d3a02063b7118c9fcee0caca871&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select')
-    return connections
+    connections={}
+    connections['user_id']=userData['id']
+    connections['email']= userData['email'] if userData['email'] else None
 
+    for i in connectionData:
+        if i['type'] =="steam":
+            connections['steam_name']=i['name']
+            connections['steam_id']=i['id']
+
+    if ("steam" in connections.keys()):
+        return app.send_static_file("retry.html")
+    response=Oauth.findData("authentication",connections['user_id'])
+  
+    if not ("Item" in response.keys()):
+        print ("here")
+        Oauth.inputData("authentication",connections)
+
+    
+    return  app.send_static_file("index.html")
 if __name__ == '__main__':
-    app.run( debug=True)
+    app.run( debug=True) 
