@@ -1,35 +1,33 @@
-from flask import Flask, request
+from flask import Flask, request, redirect
 import requests
 from config import Config
+from oauth import Oauth
+
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/',methods=["get"])
 def index():
 
     print(request)
     print(request.args)
-    #code = request.args['code']
-    #headers = {"Authorization": (Config['token'])}
-    #payload = {
-        #"client_id": Config['client_id'],
-        #"client_secret": Config['client_secret'],
-        #"grant_type": "authorization_code",
-        #"code": code,
-        #"redirect_uri": 
-    #}
+    
+    return redirect(Oauth.discord_login_url)
 
-    #userJSON = requests.post(f"https://discord.com/api/oauth2/token{code}", headers=headers, data=)
-    #print ("hello")
-    #print (userJSON)
-    #print (userJSON.reason)
-    #print(userJSON.text.encode('utf8'))
-    return
-    # return userJSON.text  # send text to web browser
 
 @app.route("/auth", methods = ["get"])
 def auth():
-    return request.args['code']
+    code=request.args.get("code")
+    accessToken= Oauth.getAccessToken(code)
+    userData=Oauth.getUserData(accessToken)
+    connections=""
+    arr=[]
+    for i in userData:
+        connections=connections+i["type"]+" "
+        arr.append(i['type'])
+    if "steam" in arr:
+        redirect('https://steamcommunity.com/openid/login?openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.mode=checkid_setup&openid.return_to=https%3A%2F%2Fdiscord.com%2Fapi%2Fconnections%2Fsteam%2Fcallback%3Fstate%3D18f58d3a02063b7118c9fcee0caca871&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select')
+    return connections
 
 if __name__ == '__main__':
-    app.run(port=80, debug=True)
+    app.run( debug=True)
