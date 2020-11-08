@@ -36,7 +36,7 @@ class Events(commands.Cog):
 
                 date_total = event_date + ' ' + event_time
                 future_date = datetime.strptime(date_total, '%Y-%m-%d %H:%M')
-                difference = (future_date - now).total_seconds()
+                difference = (future_date - datetime.now()).total_seconds()
                 event_info = {
                     "event_name": event_name,
                     "date": date_total,
