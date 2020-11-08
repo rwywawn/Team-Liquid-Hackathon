@@ -50,13 +50,16 @@ class Tournaments(commands.Cog, name="Tournament Interface Commands"):
                 title = args[1]
                 matches = self.tournaments[title].getMatches()
                 round_num = self.tournaments[title].getCurrentRound()
-                winner = self.tournaments[title].getWinner()
-                if winner:
-                    await channel.send(f"{winenr} has won the tournament on round {round_num}!")
-                else:
-                    await channel.send(f"Presenting next match ups for round {round_num}...")
-                    for match in matches:
-                        await channel.send(f"{match[0]} versus {match[1]}!")
+                #winner = self.tournaments[title].getWinner()
+                #print(winner)
+                #if winner:
+                #    print("something won")
+                #    print(winner)
+                #    await channel.send(f"{winner} has won the tournament on round {round_num}!")
+                #else:
+                await channel.send(f"Presenting next match ups for round {round_num}...")
+                for match in matches:
+                    await channel.send(f"{match[0]} versus {match[1]}!")
 
             except IndexError:  
                 await channel.send("You are missing arguments! Check your command.")
