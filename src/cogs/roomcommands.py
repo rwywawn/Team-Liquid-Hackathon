@@ -110,56 +110,119 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
 
         elif args[0] == 'extend':
             try:
-                time = int(args[1])
                 dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
-                expiry = datetime.strptime(dbRoom["Item"]["expires"], "%Y-%m-%dT%H:%M:%S.%fZ")
+                if (ctx.message.author.id == dbRoom["Item"]["author"]):
+                    try:
+                        time = int(args[1])
+                        expiry = datetime.strptime(dbRoom["Item"]["expires"], "%Y-%m-%dT%H:%M:%S.%fZ")
 
-                expiry = expiry + timedelta(minutes=time)
-                
-                db.update_item(
-                    Key={'name': ctx.message.channel.name},
-                    UpdateExpression="set expires=:newExpires",
-                    ExpressionAttributeValues = {
-                        ":newExpires": expiry.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
-                    }
-                )
-                await channel.send(f"{time} minutes added.")
+                        expiry = expiry + timedelta(minutes=time)
+                        
+                        db.update_item(
+                            Key={'name': ctx.message.channel.name},
+                            UpdateExpression="set expires=:newExpires",
+                            ExpressionAttributeValues = {
+                                ":newExpires": expiry.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+                            }
+                        )
+                        await channel.send(f"{time} minutes added.")
 
-            except IndexError:
-                await channel.send("You did not set a time to add!")
-            except ValueError:
-                await channel.send("You must input a number!")
+                    except IndexError:
+                        await channel.send("You did not set a time to add!")
+                    except ValueError:
+                        await channel.send("You must input a number!")
+                    except:
+                        await channel.send("Unknown error...")
+                else:
+                    await channel.send("You are not the room admin!")
+
             except:
                 await channel.send("This is not a temporary room!")
 
         elif args[0] == 'invite':
-            # try:
-            invited = ctx.message.mentions
-            dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
-            user_role = discord.utils.get(guild.roles, id=int(dbRoom["Item"]['user_id']))
-            new_members = dbRoom["Item"]['members']
+            try:
+                dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
 
-            # for person in invited:
-            #     await member.add_roles(user_role)
-            #     await channel.send(f"Added {member.display_name}.")
+                if (ctx.message.author.id == dbRoom["Item"]["author"]):
+                    try:
+                        invited = ctx.message.mentions
+                        assert len(invited) > 0
 
-            await channel.send(new_members)
-            # except: 
-                # await channel.send("cum")
+                        user_role = discord.utils.get(guild.roles, id=int(dbRoom["Item"]['user_id']))
+                        new_users = dbRoom["Item"]['members']
+
+
+                        for person in invited:
+                            if person.id == dbRoom["Item"]['author']:
+                                await channel.send("You can't invite yourself.")
+                            elif person.id not in new_users:
+                                await person.add_roles(user_role)
+                                await channel.send(f"Added {person.display_name}.")
+
+                                new_users.append(person.id)
+                            else:
+                                await channel.send(f"{person.display_name} is already here.")
+
+                        db.update_item(
+                            Key={'name': ctx.message.channel.name},
+                            UpdateExpression="set members=:newMembers",
+                            ExpressionAttributeValues = {
+                                ":newMembers": new_users
+                            }
+                        )
+                    except AssertionError: 
+                        await channel.send("You didn't invite anyone else.")
+                    except:
+                        await channel.send("Unknown error...")
+                else:
+                    await channel.send("You aren't the room admin.")
+            except:
+                await channel.send("This is not a temporary room!")
 
         elif args[0] == 'kick':
-            try:
-                room = ""
+            try: 
+                dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
+
+                if (ctx.message.author.id == dbRoom["Item"]["author"]):
+                    try:
+                        kicked = ctx.message.mentions
+                        assert len(kicked) > 0
+
+                        user_role = discord.utils.get(guild.roles, id=int(dbRoom["Item"]['user_id']))
+                        new_users = dbRoom["Item"]['members']
+
+                        for person in kicked:
+                            if person.id == dbRoom["Item"]['author']:
+                                await channel.send("You can't kick yourself.")
+                            elif person.id in new_users:
+                                await person.remove_roles(user_role)
+                                await channel.send(f"Kicked {person.display_name}.")
+                                new_users.remove(person.id)
+                            else:
+                                await channel.send(f"{person.display_name} isn't in the room!")
+
+                        db.update_item(
+                            Key={'name': ctx.message.channel.name},
+                            UpdateExpression="set members=:newMembers",
+                            ExpressionAttributeValues = {
+                                ":newMembers": new_users
+                            }
+                        )
+                    except AssertionError:
+                        await channel.send("You didn't kick anyone.")
+                    except:
+                        await channel.send("Unknown error...")
+                else:
+                    await channel.send("You aren't the room admin.")
             except:
-                response = "error"
-                await channel.send(response)
+                await channel.send("This is not a temporary room!")
 
         elif args[0] == 'status':
             try:
-                room = ""
+                dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
+                # expiry = 
             except:
-                response = "error"
-                await channel.send(response)
+                await channel.send("This is not a temporary room!")
 
         elif args[0] == 'help':
             response = "The available commands are create, time, extend, add, remove, status, and help."
