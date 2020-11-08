@@ -217,15 +217,27 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
             except:
                 await channel.send("This is not a temporary room!")
 
-        elif args[0] == 'status':
-            try:
-                dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
-                # expiry = 
-            except:
-                await channel.send("This is not a temporary room!")
+        # elif args[0] == 'members':
+        #     try:
+        #         dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
+        #         people = dbRoom["Item"]['members']
+        #         author_id = dbRoom["Item"]['author']
+        #         author_name = discord.utils.get(guild.members, id=author_id).display_name
+        #         author_name = "fucker"
+        #         member_str = ""
+        #         for user in people:
+        #             member_str = member_str + ' ' + discord.utils.get(guild.members, id=user.id).display_name
+        #             await channel.send(guild.get_member())
+                
+        #         if member_str == "":
+        #             await channel.send(f"The only one in the room is {author_name}.")
+        #         else:
+        #             await channel.send(f"The creator of the room is {author_name}, and the users in here are {member_str}")
+        #     except:
+        #         await channel.send("This is not a temporary room!")
 
         elif args[0] == 'help':
-            response = "The available commands are create, time, extend, add, remove, status, and help."
+            response = "The available commands for the room are create, time, extend, add, remove, status, and help. To destroy a room, run ~destroy."
             await channel.send(response)
 
 
