@@ -8,9 +8,10 @@ import boto3
 from datetime import datetime
 from threading import Timer
 import argparse
+now = datetime.now()
 
 dynamo = boto3.resource('dynamodb')
-db = dynamo.Table('events')
+events = dynamo.Table('events')
 
 def hello():
     print("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
@@ -47,7 +48,7 @@ class Events(commands.Cog):
                     "link": event_link
                 }
 
-                db.put_item(Item=event_info)
+                events.put_item(Item=event_info)
                 await channel.send("Event info added to database")
 
                 response = f'{event_name} happening on {event_date} at {event_time}, at: {event_link}'
@@ -60,13 +61,24 @@ class Events(commands.Cog):
                 await channel.send(response)
         
         elif args[0] == 'upcoming':
-            
+
+            response = events.scan()
+            items = response['Items']
+            for i in (items):
+                await channel.send(f"**EVENT**: {i['event_name']} **ON**: {i['date']} **AT** :{i['link']}")
+        
+        elif args[0] == 'delete':
+            try:
+                event_name = args[1]
+                events.delete_item(Key={'event_name': event_name})
+                await channel.send('Event cancelled')
+            except IndexError:
+                await channel.send('Invalid Event Name')
 
 
         else:
             await channel.send("This was not an available command please use help to see available commands")
 
-while(True):
 
 
 
