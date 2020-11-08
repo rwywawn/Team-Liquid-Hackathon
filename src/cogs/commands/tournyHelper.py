@@ -54,6 +54,8 @@ class tournament():
                     if len(self.rounds[team["round"]-1]) % 2 != 0:
                         self.rounds.append([self.rounds[team["round"]-2][0]])
 
+        return winner
+
     def getCurrentRound(self):
         return self.current_round
 
