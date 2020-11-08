@@ -12,9 +12,7 @@ now = datetime.now()
 
 dynamo = boto3.resource('dynamodb')
 events = dynamo.Table('events')
-
-def hello():
-    print("HIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+sub = dynamo.Table('sub')
 
 class Events(commands.Cog):
     
@@ -24,8 +22,6 @@ class Events(commands.Cog):
     @commands.command()
     async def event(self, ctx, *args):
         channel = ctx.message.channel
-        messageAuthor = ctx.author
-        guild = messageAuthor.guild
 
         #commands list
         if args[0] == 'plan':
@@ -49,24 +45,17 @@ class Events(commands.Cog):
                 }
 
                 events.put_item(Item=event_info)
-                await channel.send("Event info added to database")
-
-                response = f'{event_name} happening on {event_date} at {event_time}, at: {event_link}'
-                await channel.send(response)
-                t = Timer(difference, hello)
-                t.start()
-
+                await channel.send("Event info added to database, event created")
             except IndexError:
                 response = "Please check your agruments!"
                 await channel.send(response)
         
         elif args[0] == 'upcoming':
-
             response = events.scan()
             items = response['Items']
             for i in (items):
                 await channel.send(f"**EVENT**: {i['event_name']} **ON**: {i['date']} **AT** :{i['link']}")
-        
+
         elif args[0] == 'delete':
             try:
                 event_name = args[1]
@@ -75,12 +64,26 @@ class Events(commands.Cog):
             except IndexError:
                 await channel.send('Invalid Event Name')
 
+        elif args[0] == 'subscribe':
+            user_id = ctx.message.author.id
+            in_sub = False
+            response = sub.scan()
+            items = response['Items']
+            for i in (items):
+                if user_id == {i['sub_user']}:
+                    in_sub = True
+                
+            if in_sub == False:
+                user_info = {
+                    "sub_user": user_id
+                }
+                sub.put_item(Item=user_info)
+                await channel.send("Subscribed! You will receive notifications from us!")
+            else:
+                await channel.send("You are already subscribed!")
 
         else:
             await channel.send("This was not an available command please use help to see available commands")
-
-
-
 
 def setup(bot):
     bot.add_cog(Events(bot)) 
