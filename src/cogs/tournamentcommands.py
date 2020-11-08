@@ -1,9 +1,9 @@
 import asyncio
 import boto3
 import discord
+from .tournyHelper import tournament
 from discord.ext import commands
 
-import commands.tournyHelper as th
 
 class Tournaments(commands.Cog, name="Tournament Interface Commands"):
     def __init__(self, bot):
@@ -12,7 +12,7 @@ class Tournaments(commands.Cog, name="Tournament Interface Commands"):
         self.tournaments = {}
 
     @commands.command()
-    async def room(self, ctx, *args):
+    async def tourny(self, ctx, *args):
         guild = ctx.message.guild
         author = ctx.message.author
         channel = ctx.message.channel
@@ -26,7 +26,7 @@ class Tournaments(commands.Cog, name="Tournament Interface Commands"):
                     title = args[1]
                     teams = args[2:]
                     
-                    tourny = th.tournament(teams, title)
+                    tourny = tournament(teams, title)
                     self.tournaments[title] = tourny
                     await channel.send(f"Tournament {title} created")
 
@@ -50,6 +50,13 @@ class Tournaments(commands.Cog, name="Tournament Interface Commands"):
                 title = args[1]
                 matches = self.tournaments[title].getMatches()
                 round_num = self.tournaments[title].getCurrentRound()
+                #winner = self.tournaments[title].getWinner()
+                #print(winner)
+                #if winner:
+                #    print("something won")
+                #    print(winner)
+                #    await channel.send(f"{winner} has won the tournament on round {round_num}!")
+                #else:
                 await channel.send(f"Presenting next match ups for round {round_num}...")
                 for match in matches:
                     await channel.send(f"{match[0]} versus {match[1]}!")
