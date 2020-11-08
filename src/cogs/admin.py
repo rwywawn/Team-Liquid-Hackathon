@@ -25,7 +25,6 @@ async def RoomThread(bot):
         for room in items:
             expiry_time = datetime.strptime(room['expires'], "%Y-%m-%dT%H:%M:%S.%fZ")
             time_diff = expiry_time - datetime.now()
-            print(time_diff)
 
             if time_diff < timedelta():
                 tc = discord.utils.get(bot.get_guild(GUILD).text_channels, id=int(room['tc_id']))

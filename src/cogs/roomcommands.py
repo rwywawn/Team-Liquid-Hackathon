@@ -56,11 +56,11 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
                 }
 
                 tc_perms = {
-                        user_role: discord.PermissionOverwrite(view_channel=False),
-                        admin_role: discord.PermissionOverwrite(view_channel=True),
-                        else_role: discord.PermissionOverwrite(view_channel=True,
+                        user_role: discord.PermissionOverwrite(view_channel=True),
+                        admin_role: discord.PermissionOverwrite(view_channel=True,
                                                                 ban_members=True,
-                                                                kick_members=True)
+                                                                kick_members=True),
+                        else_role: discord.PermissionOverwrite(view_channel=False)
                 }
 
 
