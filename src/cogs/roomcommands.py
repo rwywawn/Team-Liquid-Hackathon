@@ -25,14 +25,16 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
         # command list
         if args[0] == 'create':
             try:
+                category = discord.utils.get(guild.categories, name="Temporary-Rooms")
+                if category == None:
+                    category = await guild.create_category_channel("Temporary-Rooms")
+
                 room_name = args[1]
                 time = int(args[2])
 
                 if time > 240:
                     await channel.send(f"Time set is too long! Set to 4 hours.")
                     time = 240
-
-                await channel.send(f"room to be created with name: {room_name} and time: {time}")
 
                 admin_role = await guild.create_role(name=f"{room_name}-admin")
                 user_role = await guild.create_role(name=f"{room_name}-user")
@@ -64,9 +66,11 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
 
 
                 vc = await guild.create_voice_channel(room_name,
-                                                        overwrites=vc_perms)
+                                                        overwrites=vc_perms,
+                                                        category=category)
                 tc = await guild.create_text_channel(room_name,
-                                                        overwrites=tc_perms)
+                                                        overwrites=tc_perms,
+                                                        category=category)
 
                 room_info = {
                     "name": room_name,
@@ -82,7 +86,7 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
 
                 try:
                     db.put_item(Item=room_info)
-                    await channel.send("Room info added to database.")
+                    await channel.send("Room created!")
                 except:
                     await tc.delete()
                     await vc.delete()
@@ -94,7 +98,7 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
                 await channel.send("You are missing arguments! Check your command.")
             except ValueError:
                 await channel.send("You have to pass in a number for time! Check your command.")
-            except:
+            except Exception:
                 await channel.send("Unknown error the fuck did you do")
 
         elif args[0] == 'time':
@@ -217,51 +221,30 @@ class Rooms(commands.Cog, name='Room Creation Commands'):
             except:
                 await channel.send("This is not a temporary room!")
 
-        # elif args[0] == 'members':
-        #     try:
-        #         dbRoom = db.get_item(Key={'name': ctx.message.channel.name})
-        #         people = dbRoom["Item"]['members']
-        #         author_id = dbRoom["Item"]['author']
-        #         author_name = discord.utils.get(guild.members, id=author_id).display_name
-        #         author_name = "fucker"
-        #         member_str = ""
-        #         for user in people:
-        #             member_str = member_str + ' ' + discord.utils.get(guild.members, id=user.id).display_name
-        #             await channel.send(guild.get_member())
-                
-        #         if member_str == "":
-        #             await channel.send(f"The only one in the room is {author_name}.")
-        #         else:
-        #             await channel.send(f"The creator of the room is {author_name}, and the users in here are {member_str}")
-        #     except:
-        #         await channel.send("This is not a temporary room!")
-
         elif args[0] == 'help':
             response = "The available commands for the room are create, time, extend, add, remove, status, and help. To destroy a room, run ~destroy."
             await channel.send(response)
 
+        elif args[0] == 'destroy':
 
-    @commands.command()
-    async def destroy(self, ctx):
-        guild = ctx.message.guild
-        author = ctx.message.author
-        channel = ctx.message.channel
+            toDestroy = db.get_item(Key={'name': ctx.message.channel.name})
 
-        toDestroy = db.get_item(Key={'name': ctx.message.channel.name})
+            if (ctx.message.author.id == toDestroy["Item"]["author"]):
 
-        if (ctx.message.author.id == toDestroy["Item"]["author"]):
-            # clearing channels and roles created
-            tc = discord.utils.get(guild.text_channels, id=int(toDestroy["Item"]['tc_id']))
-            vc = discord.utils.get(guild.voice_channels, id=int(toDestroy["Item"]['vc_id']))
+                tc = discord.utils.get(guild.text_channels, id=int(toDestroy["Item"]['tc_id']))
+                vc = discord.utils.get(guild.voice_channels, id=int(toDestroy["Item"]['vc_id']))
 
-            admin_role = discord.utils.get(guild.roles, id=int(toDestroy["Item"]['admin_id']))
-            user_role = discord.utils.get(guild.roles, id=int(toDestroy["Item"]['user_id']))
+                admin_role = discord.utils.get(guild.roles, id=int(toDestroy["Item"]['admin_id']))
+                user_role = discord.utils.get(guild.roles, id=int(toDestroy["Item"]['user_id']))
 
-            await tc.delete()
-            await vc.delete()
-            await user_role.delete()
-            await admin_role.delete()
+                await tc.delete()
+                await vc.delete()
+                await user_role.delete()
+                await admin_role.delete()
 
-            db.delete_item(Key={'name': ctx.message.channel.name})
+                db.delete_item(Key={'name': ctx.message.channel.name})
+            else:
+                await channel.send("You are not the rooms owner!")
+
         else:
-            await channel.send("You are not the rooms owner!")
+            await channel.send("Unrecognized command - Try running ~room help.")
