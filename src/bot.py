@@ -9,6 +9,7 @@ from discord.ext import commands
 from cogs.roomcommands import Rooms
 from cogs.admin import Admin
 from cogs.tournamentcommands import Tournaments
+from cogs.auth import Auth
 
 bot = discord.Client()
 
@@ -17,6 +18,7 @@ def main():
     bot.add_cog(Rooms(bot))
     bot.add_cog(Admin(bot))
     bot.add_cog(Tournaments(bot))
+    bot.add_cog(Auth(bot))
     bot.run(Config['token'])
 
 
