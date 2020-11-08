@@ -1,19 +1,44 @@
-from flask import Flask, request
+from flask import Flask, request, redirect, render_template
+import requests
+from config import Config
+from oauth import Oauth
+
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/',methods=["get"])
 def index():
-    print('args:', request.args)  # display text in console
-    print('form:', request.form)
-    print('data:', request.data)
-    print('json:', request.json)
-    print('files:', request.files)
-    #print("request:", request)
+
+    print(request)
+    print(request.args)
     
+    return redirect(Oauth.discord_login_url)
 
-    print(request.args['code'])
-    return request.args.get('data', 'none')  # send text to web browser
 
+@app.route("/auth", methods = ["get"])
+def auth():
+    code=request.args.get("code")
+    accessToken= Oauth.getAccessToken(code)
+    connectionData=Oauth.getConnectionData(accessToken)
+    userData=Oauth.getUserData(accessToken)
+    connections={}
+    connections['user_id']=userData['id']
+    connections['email']= userData['email'] if userData['email'] else None
+
+    for i in connectionData:
+        if i['type'] =="steam":
+            connections['steam_name']=i['name']
+            connections['steam_id']=i['id']
+
+    if ("steam" in connections.keys()):
+        return app.send_static_file("retry.html")
+    response=Oauth.findData("authentication",connections['user_id'])
+  
+    if not ("Item" in response.keys()):
+        print ("here")
+        Oauth.inputData("authentication",connections)
+
+    
+    return  app.send_static_file("index.html")
 if __name__ == '__main__':
-    app.run(port=80, debug=True)
+    app.run( debug=True) 
