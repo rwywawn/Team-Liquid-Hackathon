@@ -1,11 +1,11 @@
 import discord
 import random
-from tableCreater import tableCreate
-from inputData import inputData
+from .tableCreater import tableCreate
+from .inputData import inputData
 from botocore.exceptions import ClientError
 import boto3
 import time
-from queryData import queryTeamsByID, queryTeamsByRound, updateTeamByID
+from .queryData import queryTeamsByID, queryTeamsByRound, updateTeamByID
 
 class tournament():
 
@@ -58,6 +58,12 @@ class tournament():
 
     def getCurrentRound(self):
         return self.current_round
+
+    def checkWinner(self):
+        if len(self.rounds[self.current_round-1]) == 1:
+            return self.rounds[self.current_round-1][0]
+
+        return None
 
     def getMatches(self): # show games for the current round
         result = []
