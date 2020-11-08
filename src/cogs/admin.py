@@ -36,9 +36,6 @@ async def EventThread():
             future_date = datetime.strptime(date_total, '%Y-%m-%d %H:%M')
             difference = (future_date - now).total_seconds()
 
-            if difference < 60:
-                print('i hate this it does not work for the life of me')
-
         await asyncio.sleep(EVENT_SLEEPER)
 
 

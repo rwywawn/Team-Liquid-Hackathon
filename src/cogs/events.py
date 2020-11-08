@@ -15,9 +15,6 @@ dynamo = boto3.resource('dynamodb')
 events = dynamo.Table('events')
 sub = dynamo.Table('sub')
 
-def ghetto():
-    print('super ghetto memory method I give up')
-
 class Events(commands.Cog):
     
     def __init__(self, bot):
@@ -83,8 +80,24 @@ class Events(commands.Cog):
                 await channel.send("Subscribed! You will receive notifications from us!")
             else:
                 await channel.send("You are already subscribed!")
-        
-        
+            
+        elif args[0] == 'mention':
+            response_user = sub.scan()
+            items_user = response_user['Items']
+            response_event = events.scan()
+            items_event = response_event['Items']
+            for i in items_event:
+                now = datetime.now()
+                date_total = i['date']
+                future_date = datetime.strptime(date_total, '%Y-%m-%d %H:%M')
+                difference = (future_date - now).total_seconds()
+
+                if difference < 60:
+                    for users in items_user:
+                        await channel.send(f"**REMINDER**: <@{users['sub_user']}> EVENT STARTING NOW {i['event_name']} AT {i['link']}")
+
+            
+
 
         
 
